@@ -138,6 +138,19 @@ int main(){
     getKeyFromSecret(sA_byM_gp, keyA_byM_gp);
     unsigned char* aliceCiphertextDeciphered_gp = aes_cbc_decrypt_evp(aliceCiphertext_gp,16,IV_A_gp,keyA_byM_gp);
 
+    // B --> M, msg
+    unsigned char IV_B_gp[16];
+    getrandom(IV_B_gp, 16, 0);
+    unsigned char keyB_gp[16];
+    getKeyFromSecret(sB, keyB_gp);
+    unsigned char* bobCiphertext_gp = aes_cbc_encrypt_evp(bobMessage, 10, IV_B_gp, keyB_gp);
+
+    // M intercepts the message and decrypts it
+    // M knows sB to be 0, so they derive their own key from sB=0
+    mpz_set_ui(sB_byM_gp, 0) ;
+    unsigned char keyB_byM_gp[16];
+    getKeyFromSecret(sB_byM_gp, keyB_byM_gp);
+    unsigned char* bobCiphertextDeciphered_gp = aes_cbc_decrypt_evp(bobCiphertext_gp,16,IV_B_gp,keyB_byM_gp);
 
 
     return 0;
