@@ -143,7 +143,7 @@ int main(){
     getrandom(IV_B_gp, 16, 0);
     unsigned char keyB_gp[16];
     getKeyFromSecret(sB, keyB_gp);
-    unsigned char* bobCiphertext_gp = aes_cbc_encrypt_evp(bobMessage, 10, IV_B_gp, keyB_gp);
+    unsigned char* bobCiphertext_gp = aes_cbc_encrypt_evp(bobMessage, 12, IV_B_gp, keyB_gp);
 
     // M intercepts the message and decrypts it
     // M knows sB to be 0, so they derive their own key from sB=0
@@ -183,6 +183,25 @@ int main(){
     mpz_set(sA_byM_gp1, gp1);
     getKeyFromSecret(sA_byM_gp1, keyA_byM_gp1);
     unsigned char* aliceCiphertextDeciphered_gp1_p1 = aes_cbc_decrypt_evp(aliceCiphertext_gp1,16,IV_A_gp1,keyA_byM_gp1);
+
+    // B --> M, msg
+    unsigned char IV_B_gp1[16];
+    getrandom(IV_B_gp1, 16, 0);
+    unsigned char keyB_gp1[16];
+    getKeyFromSecret(sB, keyB_gp1);
+    unsigned char* bobCiphertext_gp1 = aes_cbc_encrypt_evp(bobMessage, 12, IV_B_gp1, keyB_gp1);
+
+    // M intercepts the message and decrypts it
+    // M knows sB to be 1 or p-1, so they derive their own key from sB=1 or sB=p-1
+    // with sA=1
+    mpz_set_ui(sB_byM_gp1, 1) ;
+    unsigned char keyB_byM_gp1[16];
+    getKeyFromSecret(sB_byM_gp1, keyB_byM_gp1);
+    unsigned char* bobCiphertextDeciphered_gp1_1 = aes_cbc_decrypt_evp(bobCiphertext_gp1,16,IV_B_gp1,keyB_byM_gp1);
+    // with sA = p-1
+    mpz_set(sB_byM_gp1, gp1);
+    getKeyFromSecret(sB_byM_gp1, keyB_byM_gp1);
+    unsigned char* bobCiphertextDeciphered_gp1_p1 = aes_cbc_decrypt_evp(bobCiphertext_gp1,16,IV_B_gp1,keyB_byM_gp1);
 
     return 0;
 }
